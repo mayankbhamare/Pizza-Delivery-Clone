@@ -71,9 +71,9 @@ const registerUser = asyncHandler(async (req, res) => {
         email,
         password,
         verificationToken,
-        isVerified: false,
-        role: 'user', // Default role
-        isAdmin: false // Sync with role if needed, but keeping separate for now
+        isVerified: true, // Default to true so users can login immediately in demo environment
+        role: 'user',
+        isAdmin: false
     });
 
     if (user) {
@@ -87,7 +87,6 @@ const registerUser = asyncHandler(async (req, res) => {
             });
         } catch (error) {
             console.error("Verification email failed to send:", error);
-            // We could delete the user here, but let's leave it and maybe allow resend later
         }
 
         res.status(201).json({
@@ -95,8 +94,7 @@ const registerUser = asyncHandler(async (req, res) => {
             name: user.name,
             email: user.email,
             isAdmin: user.isAdmin,
-            message: 'Registration successful. Please check your email to verify account.',
-            // No token returned, so frontend won't auto-login
+            message: 'Registration successful! You can log in immediately.',
         });
     } else {
         res.status(400);
@@ -135,22 +133,18 @@ const forgotPassword = asyncHandler(async (req, res) => {
         throw new Error('User not found');
     }
 
-    // Generate Reset Token
     const resetToken = crypto.randomBytes(20).toString('hex');
 
-    // Hash token and set to resetPasswordToken field
     user.resetPasswordToken = crypto
         .createHash('sha256')
         .update(resetToken)
         .digest('hex');
 
-    // Set expire
-    user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 Minutes
+    user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
 
     await user.save();
 
     const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
-
     const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
 
     try {
@@ -160,16 +154,16 @@ const forgotPassword = asyncHandler(async (req, res) => {
             message,
         });
 
-        res.status(200).json({ success: true, data: 'Email sent' });
+        res.status(200).json({ success: true, data: 'Email sent', emailSent: true });
     } catch (error) {
-        console.error(error);
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpire = undefined;
-
-        await user.save();
-
-        res.status(500);
-        throw new Error('Email could not be sent');
+        console.error("Forgot Password Email failed:", error);
+        // Fallback: return the URL in the response so recruiters/users can still test the password reset flow
+        res.status(200).json({ 
+            success: true, 
+            data: 'SMTP connection failed (common on free hosts). Fallback to Demo Mode.', 
+            emailSent: false,
+            resetUrl: resetUrl 
+        });
     }
 });
 

@@ -6,13 +6,20 @@ import { toast } from 'react-toastify';
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
+    const [resetUrl, setResetUrl] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+        setResetUrl('');
         try {
-            await api.post('/auth/forgotpassword', { email });
-            toast.success('Email sent! check your inbox/console for reset link');
+            const { data } = await api.post('/auth/forgotpassword', { email });
+            if (data.resetUrl) {
+                setResetUrl(data.resetUrl);
+                toast.warning('Email service unavailable. Using Demo Fallback.');
+            } else {
+                toast.success('Email sent! check your inbox for reset link');
+            }
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to send email');
         } finally {
@@ -47,6 +54,29 @@ const ForgotPassword = () => {
                     >
                         {loading ? 'Sending...' : 'Send Reset Link'}
                     </button>
+
+                    {resetUrl && (
+                        <div style={{
+                            marginTop: '25px',
+                            padding: '15px',
+                            backgroundColor: 'rgba(239, 79, 95, 0.1)',
+                            border: '1px solid var(--primary)',
+                            borderRadius: '8px',
+                            fontSize: '0.9rem',
+                            textAlign: 'center'
+                        }}>
+                            <p style={{ color: 'var(--text)', marginBottom: '5px', fontWeight: '500' }}>
+                                ⚠️ Demo Mode Fallback
+                            </p>
+                            <p style={{ color: 'var(--text-muted)', marginBottom: '10px' }}>
+                                Render's free tier blocks email SMTP. You can use the link below to reset your password:
+                            </p>
+                            <a href={resetUrl} style={{ color: 'var(--primary)', fontWeight: 'bold', wordBreak: 'break-all' }}>
+                                Reset Password Link
+                            </a>
+                        </div>
+                    )}
+
                     <div style={{ textAlign: 'center', marginTop: '20px' }}>
                         <Link to="/login" style={{ color: 'var(--primary)' }}>Back to Login</Link>
                     </div>
