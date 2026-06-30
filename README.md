@@ -95,11 +95,3 @@ PizzaDeliveryApp/
 - Add user reviews and rating systems.
 - Include visual revenue analytics in the admin dashboard.
 
-## Author
-
-**Mayank Bhamare**  
-Computer Engineering Student  
-*Open to Internship Opportunities*
-
-- GitHub: (my GitHub profile)
-- LinkedIn: (my LinkedIn profile)
