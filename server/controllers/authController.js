@@ -71,7 +71,7 @@ const registerUser = asyncHandler(async (req, res) => {
         email,
         password,
         verificationToken,
-        isVerified: true, // Default to true so users can login immediately in demo environment
+        isVerified: false,
         role: 'user',
         isAdmin: false
     });
@@ -94,7 +94,7 @@ const registerUser = asyncHandler(async (req, res) => {
             name: user.name,
             email: user.email,
             isAdmin: user.isAdmin,
-            message: 'Registration successful! You can log in immediately.',
+            message: 'Registration successful!',
         });
     } else {
         res.status(400);
