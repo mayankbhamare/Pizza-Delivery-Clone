@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [unverifiedUrl, setUnverifiedUrl] = useState('');
     const { login, user } = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -17,10 +18,16 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setUnverifiedUrl('');
         try {
             await login(email, password);
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Login failed');
+            if (error.response?.data?.unverified) {
+                setUnverifiedUrl(error.response.data.verificationUrl);
+                toast.warning('Account not verified. Demo fallback link provided.');
+            } else {
+                toast.error(error.response?.data?.message || 'Login failed');
+            }
         }
     };
 
@@ -62,6 +69,26 @@ const Login = () => {
                     <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '0.8rem', color: '#999' }}>
                         (Actually using Password for this demo)
                     </div>
+
+                    {unverifiedUrl && (
+                        <div style={{
+                            marginTop: '20px',
+                            padding: '12px',
+                            backgroundColor: 'rgba(239, 79, 95, 0.1)',
+                            border: '1px solid var(--primary)',
+                            borderRadius: '8px',
+                            fontSize: '0.85rem',
+                            textAlign: 'center'
+                        }}>
+                            <p style={{ color: 'var(--text)', marginBottom: '5px', fontWeight: '500' }}>
+                                ⚠️ Verification Email Not Received?
+                            </p>
+                            <a href={unverifiedUrl} style={{ color: 'var(--primary)', fontWeight: 'bold' }}>
+                                Click here to verify account instantly (Demo Mode)
+                            </a>
+                        </div>
+                    )}
+
                     <div style={{ textAlign: 'center', marginTop: '15px' }}>
                         <Link to="/forgot-password" style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Forgot Password?</Link>
                     </div>

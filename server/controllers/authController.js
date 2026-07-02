@@ -14,8 +14,18 @@ const authUser = asyncHandler(async (req, res) => {
 
     if (user && (await user.matchPassword(password))) {
         if (!user.isVerified) {
-            res.status(401);
-            throw new Error('Please verify your email address to login. Check server console for link if email failed.');
+            if (!user.verificationToken) {
+                user.verificationToken = crypto.randomBytes(20).toString('hex');
+                await user.save();
+            }
+            const verificationUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/verify-email/${user.verificationToken}`;
+            
+            res.status(403).json({
+                message: 'Please verify your email address to login.',
+                unverified: true,
+                verificationUrl: verificationUrl
+            });
+            return;
         }
 
         res.json({
