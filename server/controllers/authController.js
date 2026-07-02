@@ -85,17 +85,27 @@ const registerUser = asyncHandler(async (req, res) => {
                 subject: 'PizzaXpress Email Verification',
                 message: `Please verify your email by clicking the following link: \n\n ${verificationUrl}`,
             });
+            
+            res.status(201).json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                isAdmin: user.isAdmin,
+                message: 'Registration successful! Please check your email to verify.',
+                emailSent: true
+            });
         } catch (error) {
             console.error("Verification email failed to send:", error);
+            res.status(201).json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                isAdmin: user.isAdmin,
+                message: 'Registration successful! (Demo fallback active)',
+                emailSent: false,
+                verificationUrl: verificationUrl
+            });
         }
-
-        res.status(201).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            isAdmin: user.isAdmin,
-            message: 'Registration successful!',
-        });
     } else {
         res.status(400);
         throw new Error('Invalid user data');
