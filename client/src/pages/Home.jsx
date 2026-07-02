@@ -25,8 +25,20 @@ const Home = () => {
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.3))' }}></div>
 
                 <div style={{ position: 'relative', zIndex: 1, maxWidth: '800px', padding: '0 20px' }}>
-                    <h1 style={{ fontSize: '3.5rem', fontWeight: '800', marginBottom: '20px', textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
-                        PizzaXpress
+                    <h1 style={{ 
+                        fontSize: '4.5rem', 
+                        fontWeight: '900', 
+                        marginBottom: '20px', 
+                        letterSpacing: '-1.5px',
+                        filter: 'drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.45))'
+                    }}>
+                        <span style={{
+                            background: 'linear-gradient(135deg, #FFFFFF 40%, #FFD066 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent'
+                        }}>
+                            PizzaXpress
+                        </span>
                     </h1>
                     <p style={{ fontSize: '1.8rem', marginBottom: '30px', fontWeight: '400' }}>
                         Craving the perfect pizza? Build it, order it, love it.
